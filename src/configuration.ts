@@ -17,11 +17,15 @@ export interface ApiConfiguration {
 export interface AppConfiguration {
   name: string
   port: number
+  debug: boolean
 }
 
-export default () =>
-  <Configuration>{
+export default () => {
+  const APP_DEBUG: boolean = !!process.env.APP_DEBUG || false
+
+  return <Configuration>{
     [APP]: {
+      debug: APP_DEBUG,
       name: process.env.APP_NAME || 'Evoraid',
       port: parseInt(process.env.APP_PORT) || parseInt(process.env.PORT) || 3000,
     },
@@ -39,10 +43,11 @@ export default () =>
       database: process.env.DB_NAME || 'loonify',
       namingStrategy: new SnakeNamingStrategy(),
       autoLoadEntities: true,
-      synchronize: true,
-      logging: ['error', 'warn', 'info'],
+      synchronize: APP_DEBUG,
+      logging: APP_DEBUG ? ['error', 'warn', 'info'] : ['error'],
       ssl: {
         rejectUnauthorized: false,
       },
     },
   }
+}
